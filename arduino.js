@@ -15,7 +15,7 @@ board = new five.Board();
 
 board.on("ready", function() {
 
-  let pot1, fsr1 = 0, fsr2 = 0, proximity = 100, fsr1Hit = false;
+  let pot1, fsr1 = 0, fsr2 = 0, proximity = 100, fsr2OneShot = false, fsr2Hit = false, proximityTrigger = false;
 
   potentiometer1 = new five.Sensor({
     pin: "A0",
@@ -59,6 +59,9 @@ board.on("ready", function() {
         pot1,
         fsr1,
         fsr2,
+        fsr2Hit,
+        proximity,
+        proximityTrigger
       }));
     }
   }
@@ -75,17 +78,34 @@ board.on("ready", function() {
 
   forceResistor2.on("data", function() {
     fsr2 = this.value
+    if(!fsr2OneShot) {
+      if(fsr2 > 400) {
+        fsr2Hit = true
+        fsr2OneShot = true
+      }
+    } else if (fsr2OneShot) {
+      fsr2Hit = false
+      if(fsr2 < 400) {
+        fsr2OneShot = false;
+      }
+    }
+
     sendSensorData();
   });
 
   ultrasonic1.on("data", function() {
     proximity = this.cm
-    console.log(`Proximity: ${this.cm} cm`);
+    //console.log(`Proximity: ${this.cm} cm`);
+    if(this.cm < 20) {
+      proximityTrigger = true;
+    } else {
+      proximityTrigger = false;
+    }
     sendSensorData();
   });
 
   ultrasonic1.on("change", function() {
-    console.log("The obstruction has moved.");
+    //console.log("The obstruction has moved.");
   });
 
 });

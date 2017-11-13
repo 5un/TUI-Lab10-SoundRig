@@ -42,8 +42,9 @@ export default class WebAudioFont extends React.Component {
     this.beat.len = 1/24 * this.beat.N;
     this.beat.volume = 0.4;
 
-    this.bassEnabled = true;
-    this.kitchenwareEnabled = true;
+    this.bassEnabled = false;
+    this.groove1Enabled = false;
+    this.groove2Enabled = false;
     this.masterVolume = 1.0;
 
   }
@@ -151,6 +152,7 @@ export default class WebAudioFont extends React.Component {
     if (this.beat.started) {
       console.log('started already');
     } else {
+      this.updateGains();
       this.beat.started = true;
       this.beat.startTime = this.audioContext.currentTime + 0.1;
       this.nextPiece();
@@ -242,8 +244,13 @@ export default class WebAudioFont extends React.Component {
     this.updateGains();
   }
 
-  setKitchenWareEnabled(enabled){
-    this.kitchenWareEnabled = enabled
+  setGroove1Enabled(enabled){
+    this.groove1Enabled = enabled
+    this.updateGains();
+  }
+
+  setGroove2Enabled(enabled){
+    this.groove2Enabled = enabled
     this.updateGains();
   }
 
@@ -254,9 +261,9 @@ export default class WebAudioFont extends React.Component {
 
   updateGains() {
     this.gainDrums.gain.value=0.5 * this.masterVolume;
-    this.gainSynth.gain.value=0.3 * this.masterVolume;
+    this.gainSynth.gain.value= (this.groove2Enabled ? 0.3: 0.0) * this.masterVolume;
     this.gainBass.gain.value= (this.bassEnabled ? 0.7: 0.0) * this.masterVolume;
-    this.gainHit.gain.value= (this.kitchenWareEnabled ? 0.5: 0.0) * this.masterVolume;
+    this.gainHit.gain.value= (this.groove1Enabled ? 0.5: 0.0) * this.masterVolume;
   }
 
   render() {
